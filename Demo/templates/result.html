@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+{% block title %}Prediction Result{% endblock %}
+
+{% block content %}
+<section class="result-grid">
+  <div class="glass-card prediction-card {{ risk_badge }}">
+    <span class="eyebrow">Prediction</span>
+    <h1>{{ result.prediction }}</h1>
+    <div class="probability">{{ result.probability_percent }}%</div>
+    <p>Risk Level: <strong>{{ result.risk_level }}</strong></p>
+    <div class="gauge">
+      <div class="gauge-fill" style="width: {{ result.probability_percent }}%"></div>
+    </div>
+    <div class="gauge-labels"><span>Low</span><span>Medium</span><span>High</span></div>
+  </div>
+
+  <div class="glass-card">
+    <span class="eyebrow">Main Churn Drivers</span>
+    <h2>Top Reasons</h2>
+    <div class="driver-list">
+      {% for reason in result.top_reasons %}
+      <div class="driver-item">
+        <strong>{{ reason.reason }}</strong>
+        <span>{{ reason.feature }} = {{ "%.3f"|format(reason.value) }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="glass-card">
+    <span class="eyebrow">Action Plan</span>
+    <h2>Retention Recommendations</h2>
+    <ul class="recommendations">
+      {% for rec in result.recommendations %}
+      <li>{{ rec }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="glass-card chart-card">
+    <span class="eyebrow">Feature Contribution</span>
+    <h2>SHAP-style Driver Chart</h2>
+    <canvas id="contributionChart"></canvas>
+  </div>
+</section>
+
+<section class="glass-card table-card">
+  <span class="eyebrow">Input</span>
+  <h2>Customer Profile</h2>
+  <div class="table-wrap">
+    <table>
+      <tbody>
+      {% for key, value in input_data.items() %}
+        <tr><th>{{ key }}</th><td>{{ value }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.contributionData = {{ result.chart_items | tojson }};
+  renderContributionChart("contributionChart", window.contributionData);
+</script>
+{% endblock %}

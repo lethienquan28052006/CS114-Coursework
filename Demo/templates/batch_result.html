@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block title %}Batch Result{% endblock %}
+
+{% block content %}
+<section class="summary-grid">
+  <div class="glass-card stat-card"><span>Total Rows</span><strong>{{ summary.rows }}</strong></div>
+  <div class="glass-card stat-card"><span>High Risk</span><strong>{{ summary.high_risk }}</strong></div>
+  <div class="glass-card stat-card"><span>Medium Risk</span><strong>{{ summary.medium_risk }}</strong></div>
+  <div class="glass-card stat-card"><span>Avg Churn Probability</span><strong>{{ summary.avg_probability }}%</strong></div>
+</section>
+
+<section class="glass-card table-card">
+  <div class="section-header inline">
+    <div>
+      <span class="eyebrow">Batch Output</span>
+      <h1>Prediction Preview</h1>
+    </div>
+    <a class="btn btn-primary" href="/download/{{ filename }}">Download CSV</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          {% if preview %}
+            {% for key in preview[0].keys() %}
+            <th>{{ key }}</th>
+            {% endfor %}
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in preview %}
+        <tr>
+          {% for value in row.values() %}
+          <td>{{ value }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}Batch CSV Prediction{% endblock %}
+
+{% block content %}
+<section class="batch-hero glass-card">
+  <span class="eyebrow">Batch Prediction</span>
+  <h1>Upload Customer CSV</h1>
+  <p>Predict churn risk for many gym customers at once. Sampling is not applied here; this is pure inference.</p>
+  {% if model_error %}
+  <div class="alert">Model load error: {{ model_error }}</div>
+  {% endif %}
+  <form class="upload-form" action="/batch_predict" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".csv" required>
+    <button class="btn btn-primary" type="submit">Run Batch Prediction</button>
+  </form>
+</section>
+
+<section class="glass-card table-card">
+  <h2>Required CSV Columns</h2>
+  <div class="feature-list">
+    {% for column in required_columns %}
+    <span>{{ column }}</span>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

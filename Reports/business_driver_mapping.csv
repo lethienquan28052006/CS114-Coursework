@@ -1,0 +1,8 @@
+feature,business_meaning,high_value_interpretation,suggested_action
+frequency_drop,Mức giảm tần suất đi tập tháng hiện tại so với trung bình lịch sử.,Khách đang giảm tương tác với gym.,"Gửi re-engagement campaign, nhắc lịch tập, ưu đãi PT hoặc gọi chăm sóc."
+contract_remaining_ratio,Tỷ lệ thời gian hợp đồng còn lại.,Còn nhiều thời gian hợp đồng; low value mới là rủi ro gần hết hạn.,Chạy renewal campaign trước khi hợp đồng hết hạn.
+engagement_score,Mức gắn bó tổng hợp dựa trên lifetime và tần suất tháng hiện tại.,"Khách có engagement tốt, thường giảm churn risk.","Với low engagement, triển khai onboarding, habit-building support hoặc group class."
+loyalty_score,Mức độ cam kết lâu dài dựa trên lifetime và contract period.,Khách có mức cam kết cao.,"Với low loyalty, đề xuất loyalty program hoặc ưu đãi gia hạn."
+low_current_activity,Khách đi tập dưới 1 buổi/tuần trong tháng hiện tại.,"Tần suất thấp, rủi ro churn cao.","Gửi reminder, free PT trial, hoặc lịch lớp phù hợp."
+is_contract_ending,Hợp đồng còn tối đa 1 tháng.,Rủi ro renewal cao.,"Liên hệ trước ngày hết hạn, offer renewal discount."
+far_no_group,Khách ở xa và không tham gia group visits.,Thiếu convenience và social commitment.,"Mời tham gia lớp nhóm, cộng đồng hoặc lịch tập thuận tiện."

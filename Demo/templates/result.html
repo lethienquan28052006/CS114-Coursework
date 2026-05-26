@@ -1,22 +1,22 @@
 {% extends "layout.html" %}
-{% block title %}Prediction Result{% endblock %}
+{% block title %}Kết quả dự đoán{% endblock %}
 
 {% block content %}
 <section class="result-grid">
   <div class="glass-card prediction-card {{ risk_badge }}">
-    <span class="eyebrow">Prediction</span>
+    <span class="eyebrow">Dự đoán</span>
     <h1>{{ result.prediction }}</h1>
     <div class="probability">{{ result.probability_percent }}%</div>
-    <p>Risk Level: <strong>{{ result.risk_level }}</strong></p>
+    <p>Mức rủi ro: <strong>{{ result.risk_level }}</strong></p>
     <div class="gauge">
       <div class="gauge-fill" style="width: {{ result.probability_percent }}%"></div>
     </div>
-    <div class="gauge-labels"><span>Low</span><span>Medium</span><span>High</span></div>
+    <div class="gauge-labels"><span>Thấp</span><span>Trung bình</span><span>Cao</span></div>
   </div>
 
   <div class="glass-card">
-    <span class="eyebrow">Main Churn Drivers</span>
-    <h2>Top Reasons</h2>
+    <span class="eyebrow">Yếu tố rời bỏ chính</span>
+    <h2>Lý do hàng đầu</h2>
     <div class="driver-list">
       {% for reason in result.top_reasons %}
       <div class="driver-item">
@@ -28,8 +28,8 @@
   </div>
 
   <div class="glass-card">
-    <span class="eyebrow">Action Plan</span>
-    <h2>Retention Recommendations</h2>
+    <span class="eyebrow">Kế hoạch hành động</span>
+    <h2>Khuyến nghị giữ chân</h2>
     <ul class="recommendations">
       {% for rec in result.recommendations %}
       <li>{{ rec }}</li>
@@ -38,15 +38,15 @@
   </div>
 
   <div class="glass-card chart-card">
-    <span class="eyebrow">Feature Contribution</span>
-    <h2>SHAP-style Driver Chart</h2>
-    <canvas id="contributionChart"></canvas>
+    <span class="eyebrow">Đóng góp đặc trưng</span>
+    <h2>Biểu đồ yếu tố kiểu SHAP</h2>
+    <div id="contributionChart" class="bar-chart"></div>
   </div>
 </section>
 
 <section class="glass-card table-card">
-  <span class="eyebrow">Input</span>
-  <h2>Customer Profile</h2>
+  <span class="eyebrow">Đầu vào</span>
+  <h2>Hồ sơ khách hàng</h2>
   <div class="table-wrap">
     <table>
       <tbody>

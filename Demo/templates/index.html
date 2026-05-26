@@ -1,93 +1,93 @@
 {% extends "layout.html" %}
-{% block title %}AI Gym Customer Churn Prediction{% endblock %}
+{% block title %}Dự đoán khách hàng rời bỏ phòng gym{% endblock %}
 
 {% block content %}
 <section class="hero">
   <div class="hero-content">
-    <div class="eyebrow">Production-style ML Dashboard</div>
-    <h1>AI Gym Customer Churn Prediction</h1>
-    <p>Estimate churn probability, understand risk drivers, and generate retention actions for gym customers.</p>
+    <div class="eyebrow">Bảng điều khiển</div>
+    <h1>Dự đoán khách hàng rời bỏ phòng gym</h1>
+    <p>Ước tính xác suất rời bỏ, xem các yếu tố rủi ro và nhận gợi ý giữ chân khách hàng.</p>
     <div class="hero-actions">
-      <a href="#prediction-form" class="btn btn-primary">Start Prediction</a>
-      <a href="/batch" class="btn btn-secondary">Upload CSV</a>
+      <a href="#prediction-form" class="btn btn-primary">Bắt đầu dự đoán</a>
+      <a href="/batch" class="btn btn-secondary">Tải CSV lên</a>
     </div>
   </div>
   <div class="hero-panel glass-card">
     <div class="metric">
-      <span>Model</span>
+      <span>Mô hình</span>
       <strong>CatBoost + FE</strong>
     </div>
     <div class="metric">
-      <span>Target</span>
-      <strong>Churn Risk</strong>
+      <span>Mục tiêu</span>
+      <strong>Rủi ro rời bỏ</strong>
     </div>
     <div class="metric">
-      <span>Output</span>
-      <strong>Probability + Actions</strong>
+      <span>Kết quả</span>
+      <strong>Xác suất + hành động</strong>
     </div>
   </div>
 </section>
 
 {% if model_error %}
-<div class="alert glass-card">Model load error: {{ model_error }}</div>
+<div class="alert glass-card">Lỗi tải mô hình: {{ model_error }}</div>
 {% endif %}
 
 <section class="grid-2">
   <form id="prediction-form" class="glass-card form-card" action="/predict" method="post">
     <div class="section-header">
-      <span class="eyebrow">Single Customer</span>
-      <h2>Prediction Form</h2>
+      <span class="eyebrow">Một khách hàng</span>
+      <h2>Biểu mẫu dự đoán</h2>
     </div>
 
     <div class="form-section">
-      <h3>Customer Info</h3>
+      <h3>Thông tin khách hàng</h3>
       <div class="form-grid">
-        <label>Gender <select name="gender"><option value="1">Male / 1</option><option value="0">Female / 0</option></select></label>
-        <label>Age <input type="number" name="Age" min="14" max="100" value="30" required></label>
-        <label>Near Location <select name="Near_Location"><option value="1">Yes</option><option value="0">No</option></select></label>
-        <label>Phone <select name="Phone"><option value="1">Available</option><option value="0">Missing</option></select></label>
+        <label>Giới tính <select name="gender"><option value="1">Nam / 1</option><option value="0">Nữ / 0</option></select></label>
+        <label>Tuổi <input type="number" name="Age" min="14" max="100" value="30" required></label>
+        <label>Gần phòng gym <select name="Near_Location"><option value="1">Có</option><option value="0">Không</option></select></label>
+        <label>Số điện thoại <select name="Phone"><option value="1">Có</option><option value="0">Thiếu</option></select></label>
       </div>
     </div>
 
     <div class="form-section">
-      <h3>Contract Info</h3>
+      <h3>Thông tin hợp đồng</h3>
       <div class="form-grid">
-        <label>Contract Period <input type="number" name="Contract_period" min="1" max="24" value="6" required></label>
-        <label>Month To End Contract <input type="number" step="0.1" name="Month_to_end_contract" min="0" max="24" value="3" required></label>
-        <label>Lifetime <input type="number" name="Lifetime" min="0" max="60" value="3" required></label>
-        <label>Partner <select name="Partner"><option value="1">Yes</option><option value="0">No</option></select></label>
+        <label>Thời hạn hợp đồng <input type="number" name="Contract_period" min="1" max="24" value="6" required></label>
+        <label>Số tháng còn lại <input type="number" step="0.1" name="Month_to_end_contract" min="0" max="24" value="3" required></label>
+        <label>Thời gian gắn bó <input type="number" name="Lifetime" min="0" max="60" value="3" required></label>
+        <label>Đối tác <select name="Partner"><option value="1">Có</option><option value="0">Không</option></select></label>
       </div>
     </div>
 
     <div class="form-section">
-      <h3>Gym Activity</h3>
+      <h3>Hoạt động tập luyện</h3>
       <div class="form-grid">
-        <label>Avg Frequency Total <input type="number" step="0.01" name="Avg_class_frequency_total" min="0" max="10" value="2.0" required></label>
-        <label>Avg Frequency Current Month <input type="number" step="0.01" name="Avg_class_frequency_current_month" min="0" max="10" value="1.5" required></label>
-        <label>Additional Charges Total <input type="number" step="0.01" name="Avg_additional_charges_total" min="0" value="120" required></label>
-        <label>Group Visits <select name="Group_visits"><option value="1">Yes</option><option value="0">No</option></select></label>
+        <label>Tần suất trung bình tổng <input type="number" step="0.01" name="Avg_class_frequency_total" min="0" max="10" value="2.0" required></label>
+        <label>Tần suất tháng hiện tại <input type="number" step="0.01" name="Avg_class_frequency_current_month" min="0" max="10" value="1.5" required></label>
+        <label>Tổng chi tiêu thêm <input type="number" step="0.01" name="Avg_additional_charges_total" min="0" value="120" required></label>
+        <label>Tham gia nhóm tập luyện<select name="Group_visits"><option value="1">Có</option><option value="0">Không</option></select></label>
       </div>
     </div>
 
     <div class="form-section">
-      <h3>Engagement</h3>
+      <h3>Mức độ tương tác</h3>
       <div class="form-grid compact">
-        <label>Promo Friends <select name="Promo_friends"><option value="0">No</option><option value="1">Yes</option></select></label>
+        <label>Tham gia qua bạn bè giới thiệu<select name="Promo_friends"><option value="0">Không</option><option value="1">Có</option></select></label>
       </div>
     </div>
 
-    <button class="btn btn-primary full" type="submit">Predict Churn Risk</button>
+    <button class="btn btn-primary full" type="submit">Dự đoán rủi ro rời bỏ</button>
   </form>
 
   <aside class="glass-card upload-card">
     <div class="section-header">
-      <span class="eyebrow">Batch Prediction</span>
-      <h2>Upload CSV</h2>
+      <span class="eyebrow">Dự đoán hàng loạt</span>
+      <h2>Tải CSV lên</h2>
     </div>
-    <p>Upload a CSV with the original 13 input columns and receive predictions, risk levels, top reasons, and recommendations.</p>
-    <a class="btn btn-secondary full" href="/batch">Go to Batch Upload</a>
+    <p>Tải lên CSV có 13 cột đầu vào gốc để nhận dự đoán, mức rủi ro, lý do chính và khuyến nghị.</p>
+    <a class="btn btn-secondary full" href="/batch">Đến trang tải CSV</a>
     <div class="feature-list">
-      <h3>Required Columns</h3>
+      <h3>Các cột bắt buộc</h3>
       {% for feature in features %}
       <span>{{ feature }}</span>
       {% endfor %}

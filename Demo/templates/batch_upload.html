@@ -1,22 +1,22 @@
 {% extends "layout.html" %}
-{% block title %}Batch CSV Prediction{% endblock %}
+{% block title %}Dự đoán hàng loạt bằng CSV{% endblock %}
 
 {% block content %}
 <section class="batch-hero glass-card">
-  <span class="eyebrow">Batch Prediction</span>
-  <h1>Upload Customer CSV</h1>
-  <p>Predict churn risk for many gym customers at once. Sampling is not applied here; this is pure inference.</p>
+  <span class="eyebrow">Dự đoán hàng loạt</span>
+  <h1>Tải CSV khách hàng</h1>
+  <p>Dự đoán rủi ro rời bỏ cho nhiều khách hàng cùng lúc. Trang này chỉ chạy suy luận, không lấy mẫu.</p>
   {% if model_error %}
-  <div class="alert">Model load error: {{ model_error }}</div>
+  <div class="alert">Lỗi tải mô hình: {{ model_error }}</div>
   {% endif %}
   <form class="upload-form" action="/batch_predict" method="post" enctype="multipart/form-data">
     <input type="file" name="file" accept=".csv" required>
-    <button class="btn btn-primary" type="submit">Run Batch Prediction</button>
+    <button class="btn btn-primary" type="submit">Chạy dự đoán hàng loạt</button>
   </form>
 </section>
 
 <section class="glass-card table-card">
-  <h2>Required CSV Columns</h2>
+  <h2>Các cột CSV bắt buộc</h2>
   <div class="feature-list">
     {% for column in required_columns %}
     <span>{{ column }}</span>

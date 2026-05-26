@@ -1,0 +1,16 @@
+feature,feature_type,association_method,association_score,signed_effect
+Lifetime,numeric,Spearman,0.5829865778921202,-0.5829865778921202
+Avg_class_frequency_current_month,numeric,Spearman,0.42034341954404847,-0.42034341954404847
+Contract_period,categorical/binary,Chi-square / Cramér's V,0.40421381080591084,
+Month_to_end_contract,categorical/binary,Chi-square / Cramér's V,0.40407138963319894,
+Contract_period,numeric,Spearman,0.40209573076486366,-0.40209573076486366
+Age,numeric,Spearman,0.40166396435004237,-0.40166396435004237
+Month_to_end_contract,numeric,Spearman,0.3975125454373551,-0.3975125454373551
+Avg_class_frequency_total,numeric,Spearman,0.2531038856283351,-0.2531038856283351
+Avg_additional_charges_total,numeric,Spearman,0.19143249592063868,-0.19143249592063868
+Group_visits,categorical/binary,Chi-square / Cramér's V,0.17474943299413978,
+Promo_friends,categorical/binary,Chi-square / Cramér's V,0.16162003779061251,
+Partner,categorical/binary,Chi-square / Cramér's V,0.15741924331664764,
+Near_Location,categorical/binary,Chi-square / Cramér's V,0.12731509335046848,
+Phone,categorical/binary,Chi-square / Cramér's V,0.0002176760466853504,
+gender,categorical/binary,Chi-square / Cramér's V,0.0001413202315290979,

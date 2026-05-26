@@ -1,51 +1,35 @@
-function renderContributionChart(canvasId, items) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas || !Array.isArray(items)) return;
+function renderContributionChart(containerId, items) {
+  const container = document.getElementById(containerId);
+  if (!container || !Array.isArray(items) || items.length === 0) return;
 
-  const labels = items.map((item) => item.reason || item.feature);
-  const values = items.map((item) => item.contribution);
-  const colors = values.map((value) => (value >= 0 ? "rgba(251, 113, 133, 0.82)" : "rgba(83, 182, 255, 0.82)"));
+  const maxAbs = Math.max(...items.map((item) => Math.abs(Number(item.contribution) || 0)), 0.001);
+  container.innerHTML = "";
 
-  new Chart(canvas, {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [
-        {
-          label: "Contribution",
-          data: values,
-          backgroundColor: colors,
-          borderColor: colors,
-          borderWidth: 1,
-          borderRadius: 8,
-        },
-      ],
-    },
-    options: {
-      indexAxis: "y",
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            afterLabel: (context) => {
-              const item = items[context.dataIndex];
-              return `${item.feature}: ${Number(item.value).toFixed(3)}`;
-            },
-          },
-        },
-      },
-      scales: {
-        x: {
-          grid: { color: "rgba(255,255,255,0.08)" },
-          ticks: { color: "#dbe4ff" },
-        },
-        y: {
-          grid: { display: false },
-          ticks: { color: "#dbe4ff" },
-        },
-      },
-    },
+  items.forEach((item) => {
+    const contribution = Number(item.contribution) || 0;
+    const width = Math.max(3, Math.round((Math.abs(contribution) / maxAbs) * 100));
+    const row = document.createElement("div");
+    row.className = "bar-row";
+
+    const label = document.createElement("div");
+    label.className = "bar-label";
+    label.textContent = item.reason || item.feature || "Feature";
+
+    const track = document.createElement("div");
+    track.className = "bar-track";
+
+    const fill = document.createElement("div");
+    fill.className = `bar-fill ${contribution >= 0 ? "bar-positive" : "bar-negative"}`;
+    fill.style.width = `${width}%`;
+    track.appendChild(fill);
+
+    const value = document.createElement("div");
+    value.className = "bar-value";
+    value.textContent = contribution.toFixed(3);
+
+    row.appendChild(label);
+    row.appendChild(track);
+    row.appendChild(value);
+    container.appendChild(row);
   });
 }

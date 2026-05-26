@@ -1,0 +1,121 @@
+\section{Feature Engineering}
+\label{sec:fe}
+
+\subsection{Design Philosophy}
+
+Các đặc trưng thô nắm bắt các thuộc tính khách hàng \textit{tĩnh}.
+Mục tiêu của feature engineering là tổng hợp các \textit{tín hiệu
+hành vi} trực tiếp vận hành hóa các giả thuyết churn được xác định
+trong quá trình EDA. Mỗi nhóm đặc trưng được kỹ thuật hóa mã hóa
+một khái niệm nghiệp vụ riêng biệt.
+
+\subsection{Group A: Engagement Features}
+
+\textbf{\texttt{frequency\_drop}} $= \bar{f}_{\text{total}} -
+f_{\text{current}}$ đo lường sự sụt giảm tuyệt đối trong tần suất
+tham dự từ mức trung bình lịch sử đến tháng hiện tại. Giá trị dương
+báo hiệu sự mất gắn kết gần đây — khách hàng đang đến ít hơn mức
+cơ sở của chính họ, một chỉ số dẫn đầu về churn trước khi xảy ra
+sự ngừng hoàn toàn.
+
+\textbf{\texttt{frequency\_ratio\_current\_total}} $= f_{\text{current}}
+/ (\bar{f}_{\text{total}} + \varepsilon)$ chuẩn hóa hoạt động hiện
+tại theo mức độ cá nhân lịch sử của khách hàng, làm cho chỉ số có
+thể so sánh được giữa các hội viên có cường độ cơ sở khác nhau.
+
+\textbf{\texttt{engagement\_score}} $= \texttt{Lifetime} \times
+f_{\text{current}}$ kết hợp chiều sâu thâm niên với hoạt động hiện
+tại, tạo ra cường độ tương tác tổng hợp. Khách hàng có thâm niên
+dài nhưng hoạt động hiện tại thấp có thể đang trong tình trạng rời
+bỏ thầm lặng.
+
+\textbf{\texttt{low\_current\_activity}} và
+\textbf{\texttt{high\_current\_activity}} là các cờ ngưỡng nhị phân
+tại $< 1$ và $\geq 3$ buổi/tuần, nắm bắt các cực đoan của phân
+phối tần suất tham dự được xác định trong EDA.
+
+\subsection{Group B: Contract / Renewal Risk Features}
+
+\textbf{\texttt{contract\_remaining\_ratio}} $= \texttt{Month\_to\_end}
+/ (\texttt{Contract\_period} + \varepsilon)$ biểu thị bao nhiêu
+phần trăm kỳ hợp đồng còn lại. Tỷ lệ thấp báo hiệu sự tiếp cận
+cửa sổ quyết định gia hạn.
+
+\textbf{\texttt{is\_contract\_ending}} đánh dấu khách hàng còn lại
+$\leq 1$ tháng -- danh mục rủi ro gia hạn khẩn cấp nhất.
+
+\textbf{\texttt{renewal\_pressure\_score}} $=
+\texttt{is\_contract\_ending} \times \texttt{is\_short\_contract}$
+xác định phân khúc dễ bị tổn thương nhất: khách hàng có hợp đồng
+ngắn đang hết hạn sắp tới, kết hợp hai yếu tố rủi ro theo cách
+nhân.
+
+\subsection{Group C: Loyalty Features}
+
+\textbf{\texttt{loyalty\_score}} $= \texttt{Lifetime} \times
+\texttt{Contract\_period}$ đo lường cam kết tích lũy như tích của
+thâm niên và chiều sâu hợp đồng. Khách hàng đã là hội viên trong
+nhiều tháng với các hợp đồng dài hạn thể hiện mức độ quán tính
+cao và rủi ro churn thấp.
+
+\textbf{\texttt{is\_new\_customer}} và
+\textbf{\texttt{is\_loyal\_customer}} đánh dấu các ngưỡng tháng
+thứ nhất và thứ sáu, nắm bắt hai ranh giới vòng đời quan trọng
+được xác định trong EDA.
+
+\subsection{Group D: Interaction Features}
+
+Các đặc trưng tương tác nắm bắt các hiệu ứng kết hợp phi tuyến
+mà các mô hình cộng tính đơn giản không thể biểu diễn:
+
+\textbf{\texttt{new\_low\_activity}} $= \texttt{is\_new\_customer}
+\times \texttt{low\_current\_activity}}$: một hội viên mới đã thể
+hiện tần suất tham dự thấp ngay lập tức đang ở mức rủi ro bỏ học
+sớm cực độ.
+
+\textbf{\texttt{ending\_low\_activity}} $=
+\texttt{is\_contract\_ending} \times
+\texttt{low\_current\_activity}}$: hợp đồng sắp hết hạn kết hợp
+với tần suất tham dự thấp đại diện cho trường hợp giữ chân khẩn
+cấp nhất.
+
+\textbf{\texttt{no\_group\_low\_activity}},
+\textbf{\texttt{far\_low\_activity}} và
+\textbf{\texttt{short\_contract\_low\_activity}} nắm bắt các kịch
+bản rủi ro kết hợp bổ sung từ sự cô lập xã hội, bất tiện địa lý
+và sự mỏng manh cấu trúc hợp đồng.
+
+\subsection{Group E: Convenience and Social Features}
+
+\textbf{\texttt{convenience\_score}} $= \texttt{Near\_Location}
++ \texttt{Partner} + \texttt{Promo\_friends} + \texttt{Phone}$
+tổng hợp các tín hiệu giảm ma sát: khách hàng ở gần, có hội viên
+đồng hành, tham gia qua giới thiệu bạn bè và cung cấp thông tin
+liên hệ thể hiện cam kết cao hơn nhiều lần.
+
+\textbf{\texttt{social\_commitment\_score}} $= \texttt{Group\_visits}
++ \texttt{Promo\_friends} + \texttt{Partner}$ nhắm đến sự hòa nhập
+xã hội: khách hàng tích hợp vào mạng lưới xã hội của phòng gym rời
+bỏ với tỷ lệ thấp hơn đáng kể.
+
+\subsection{Group F: Log-Transformed Features}
+
+Các biến đổi logarithm của \texttt{Lifetime},
+\texttt{Avg\_additional\_charges} và cả hai đặc trưng tần suất giúp
+giảm độ lệch phải và ổn định phương sai, mang lại lợi ích cho cả
+mô hình tuyến tính lẫn gradient boosting. Toàn bộ quy trình feature
+engineering mở rộng không gian đặc trưng từ \textbf{13 đặc trưng
+thô} lên \textbf{46 đặc trưng}, bổ sung 33 chiều được kỹ thuật hóa.
+
+% ── Figure placeholder ──────────────────────────────────────
+\begin{figure}[H]
+  \centering
+  % CHÈN ẢNH: reports/figures/fe_top15_engineered_feature_correlation.png
+  % (từ 03_feature_engineering_models.ipynb, Mục 8)
+  \includegraphics[width=\linewidth]{images/fe_top_engineered_feature_correlation.png}
+  \caption{Top 15 đặc trưng được kỹ thuật hóa theo tương quan Pearson
+           tuyệt đối với \texttt{Churn} (tập train). Các đặc trưng
+           \texttt{engagement\_score}, \texttt{loyalty\_score} và
+           \texttt{frequency\_drop} xếp hạng cao nhất.}
+  \label{fig:fe_corr}
+\end{figure}

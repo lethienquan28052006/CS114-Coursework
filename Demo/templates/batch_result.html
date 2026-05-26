@@ -1,21 +1,21 @@
 {% extends "layout.html" %}
-{% block title %}Batch Result{% endblock %}
+{% block title %}Kết quả dự đoán hàng loạt{% endblock %}
 
 {% block content %}
 <section class="summary-grid">
-  <div class="glass-card stat-card"><span>Total Rows</span><strong>{{ summary.rows }}</strong></div>
-  <div class="glass-card stat-card"><span>High Risk</span><strong>{{ summary.high_risk }}</strong></div>
-  <div class="glass-card stat-card"><span>Medium Risk</span><strong>{{ summary.medium_risk }}</strong></div>
-  <div class="glass-card stat-card"><span>Avg Churn Probability</span><strong>{{ summary.avg_probability }}%</strong></div>
+  <div class="glass-card stat-card"><span>Tổng số dòng</span><strong>{{ summary.rows }}</strong></div>
+  <div class="glass-card stat-card"><span>Rủi ro cao</span><strong>{{ summary.high_risk }}</strong></div>
+  <div class="glass-card stat-card"><span>Rủi ro trung bình</span><strong>{{ summary.medium_risk }}</strong></div>
+  <div class="glass-card stat-card"><span>Xác suất rời bỏ TB</span><strong>{{ summary.avg_probability }}%</strong></div>
 </section>
 
 <section class="glass-card table-card">
   <div class="section-header inline">
     <div>
-      <span class="eyebrow">Batch Output</span>
-      <h1>Prediction Preview</h1>
+      <span class="eyebrow">Kết quả hàng loạt</span>
+      <h1>Xem trước dự đoán</h1>
     </div>
-    <a class="btn btn-primary" href="/download/{{ filename }}">Download CSV</a>
+    <a class="btn btn-primary" href="/download/{{ filename }}">Tải CSV xuống</a>
   </div>
   <div class="table-wrap">
     <table>

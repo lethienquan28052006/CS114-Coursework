@@ -1,4 +1,6 @@
-﻿# Gym Customers Churn Prediction
+﻿![](image.png)
+
+# Gym Customers Churn Prediction
 
 Đồ án Machine Learning dự đoán khả năng khách hàng phòng gym rời bỏ dịch vụ (customer churn) dựa trên thông tin hợp đồng, hành vi tập luyện, mức chi tiêu và các đặc trưng liên quan đến mức độ gắn kết của khách hàng.
 

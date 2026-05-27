@@ -1,273 +1,328 @@
-2. Pipeline tổng thể
+﻿# Gym Customers Churn Prediction
+
+Đồ án Machine Learning dự đoán khả năng khách hàng phòng gym rời bỏ dịch vụ (customer churn) dựa trên thông tin hợp đồng, hành vi tập luyện, mức chi tiêu và các đặc trưng liên quan đến mức độ gắn kết của khách hàng.
+
+Project bao gồm quá trình phân tích dữ liệu, huấn luyện nhiều mô hình học máy, xử lý mất cân bằng dữ liệu, feature engineering, giải thích mô hình bằng SHAP và demo web dự đoán churn cho từng khách hàng hoặc theo file CSV.
+
+## 1. Mục tiêu
+
+- Phân tích các yếu tố ảnh hưởng đến churn của khách hàng phòng gym.
+- Xây dựng mô hình phân loại dự đoán khách hàng có nguy cơ rời bỏ.
+- So sánh nhiều thuật toán Machine Learning theo các metric phù hợp với bài toán churn.
+- Cải thiện hiệu năng bằng feature engineering và các kỹ thuật xử lý mất cân bằng dữ liệu.
+- Giải thích kết quả dự đoán bằng feature importance và SHAP.
+- Triển khai demo web để nhập dữ liệu và nhận kết quả dự đoán churn.
+
+## 2. Dữ liệu
+
+Dữ liệu chính nằm trong thư mục `Data/`.
+
+- `Data/gym_churn_us.csv`: bộ dữ liệu huấn luyện và phân tích chính.
+- `Data/test.csv`: dữ liệu mẫu dùng để kiểm thử batch prediction.
+
+Target:
+
+- `Churn = 0`: khách hàng không rời bỏ.
+- `Churn = 1`: khách hàng rời bỏ.
+
+Các cột đầu vào chính:
+
+- `gender`
+- `Near_Location`
+- `Partner`
+- `Promo_friends`
+- `Phone`
+- `Contract_period`
+- `Group_visits`
+- `Age`
+- `Avg_additional_charges_total`
+- `Month_to_end_contract`
+- `Lifetime`
+- `Avg_class_frequency_total`
+- `Avg_class_frequency_current_month`
+
+## 3. Cấu trúc thư mục
+
+```text
+.
+├── Data/
+│   ├── gym_churn_us.csv
+│   └── test.csv
+├── Notebooks/
+│   ├── 01_EDA.ipynb
+│   ├── 02_baseline_models.ipynb
+│   ├── 03_feature_engineering_models.ipynb
+│   ├── 04_imbalance_handling_models.ipynb
+│   └── 05_shap_explainability.ipynb
+├── Models/
+│   ├── baseline_model_metrics.csv
+│   ├── best_baseline_model.pkl
+│   ├── best_feature_engineering_model.pkl
+│   ├── best_imbalance_model.pkl
+│   └── catboost_fe_shap_model.pkl
+├── Reports/
+│   ├── *.csv
+│   └── figures/
+├── OutputForReports/
+├── Demo/
+│   ├── app.py
+│   ├── requirements.txt
+│   ├── models/
+│   ├── utils/
+│   ├── templates/
+│   ├── static/
+│   ├── uploads/
+│   └── outputs/
+├── CS114_Report_Nhom5.pdf
+├── CS114_Slide_Nhom5.pdf
+├── feature_engineering_formular.txt
+└── Readme.txt
+```
+
+## 4. Quy trình thực hiện
+
+Pipeline tổng quát:
+
+```text
 Raw data
-→ EDA
-→ Train-test split
-→ Preprocessing
-→ Feature engineering
-→ Imbalance handling
-→ Train baseline models
-→ Tune best models
-→ Evaluate
-→ SHAP explainability
-→ Export final pipeline
-3. Notebook 01 — EDA
-
-Mục tiêu: hiểu data, target, phân phối, quan hệ feature với churn.
-
-Nội dung nên có:
-
-1. Load data
-2. Check shape, columns, dtypes
-3. Check missing values
-4. Check duplicated rows
-5. Target distribution: Churn = 0/1
-6. Univariate analysis
-7. Bivariate analysis với Churn
-8. Correlation heatmap
-9. Initial insights
-
-Các biểu đồ nên làm:
-
-- Countplot Churn
-- Histogram Age, Lifetime, Avg_class_frequency_total
-- Boxplot Lifetime vs Churn
-- Boxplot Month_to_end_contract vs Churn
-- Boxplot Avg_class_frequency_current_month vs Churn
-- Countplot Contract_period vs Churn
-- Correlation heatmap
-
-Insight ban đầu từ ảnh bạn gửi:
-
-- Data có 4000 dòng, không missing.
-- Churn mean khoảng 0.27 → tỷ lệ churn khoảng 27%, có imbalance nhẹ/vừa.
-- Lifetime lệch phải mạnh, nhiều khách mới.
-- Month_to_end_contract tập trung nhiều ở 1 tháng → đây có thể là feature rất mạnh.
-- Avg_class_frequency_current_month có vẻ là feature hành vi quan trọng.
-- Contract_period có các mức rõ ràng, nhiều khả năng là 1, 6, 12 tháng.
-4. Notebook 02 — Preprocessing baseline
-
-Vì data này hầu hết đã encode dạng số 0/1, preprocessing không quá phức tạp.
-
-Chia cột:
-
-target_col = "Churn"
-
-binary_cols = [
-    "gender", "Near_Location", "Partner",
-    "Promo_friends", "Phone", "Group_visits"
-]
-
-numeric_cols = [
-    "Age",
-    "Avg_additional_charges_total",
-    "Month_to_end_contract",
-    "Lifetime",
-    "Avg_class_frequency_total",
-    "Avg_class_frequency_current_month"
-]
-
-ordinal_cols = [
-    "Contract_period"
-]
+-> EDA
+-> Train/test split
+-> Baseline modeling
+-> Feature engineering
+-> Imbalance handling
+-> Model evaluation
+-> SHAP explainability
+-> Export best model
+-> Demo prediction app
+```
+
+Các notebook:
+
+1. `01_EDA.ipynb`
+   - Kiểm tra dữ liệu, missing values, duplicated rows.
+   - Phân tích phân phối target `Churn`.
+   - Phân tích univariate và bivariate.
+   - Vẽ heatmap tương quan và rút insight ban đầu.
+
+2. `02_baseline_models.ipynb`
+   - Huấn luyện các mô hình baseline.
+   - So sánh Logistic Regression, KNN, Decision Tree, Random Forest, Extra Trees, Gradient Boosting, XGBoost, LightGBM, CatBoost.
+   - Đánh giá bằng Accuracy, Precision, Recall, F1 và ROC-AUC.
+
+3. `03_feature_engineering_models.ipynb`
+   - Tạo các đặc trưng mới từ hành vi tập luyện, hợp đồng, chi tiêu và mức độ gắn kết.
+   - So sánh hiệu năng trước và sau feature engineering.
+
+4. `04_imbalance_handling_models.ipynb`
+   - Thử các chiến lược xử lý mất cân bằng dữ liệu.
+   - So sánh No Handling, Class Weight, RandomOverSampler, SMOTE, BorderlineSMOTE, ADASYN.
+
+5. `05_shap_explainability.ipynb`
+   - Phân tích feature importance.
+   - Giải thích mô hình bằng SHAP.
+   - Phân tích các yếu tố chính làm tăng hoặc giảm nguy cơ churn.
 
-Pipeline đề xuất:
+## 5. Feature engineering
+
+Một số nhóm đặc trưng được tạo thêm:
+
+- Mức thay đổi tần suất tập luyện:
+  - `frequency_drop`
+  - `frequency_ratio_current_total`
+  - `low_current_activity`
+  - `high_current_activity`
+
+- Mức độ gắn kết:
+  - `engagement_score`
+  - `total_engagement_score`
+  - `loyalty_score`
+  - `social_commitment_score`
 
-- Không encode thêm nếu tất cả đã numeric.
-- Scale numeric cho Logistic Regression, SVM, KNN.
-- Không cần scale cho RandomForest, XGBoost, CatBoost, LightGBM.
+- Trạng thái hợp đồng:
+  - `contract_remaining_ratio`
+  - `is_contract_ending`
+  - `is_short_contract`
+  - `is_long_contract`
+  - `renewal_pressure_score`
 
-Quan trọng: split trước rồi mới preprocess để tránh data leakage.
+- Chi tiêu:
+  - `spending_per_month`
+  - `high_spending`
+  - `low_spending`
+  - `log_additional_charges`
 
-X = df.drop(columns=["Churn"])
-y = df["Churn"]
+- Tổ hợp rủi ro:
+  - `new_low_activity`
+  - `ending_low_activity`
+  - `short_contract_low_activity`
+  - `no_group_low_activity`
+  - `far_low_activity`
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y,
-    test_size=0.2,
-    stratify=y,
-    random_state=42
-)
-5. Notebook 03 — Data imbalance
+Danh sách công thức chi tiết có trong file `feature_engineering_formular.txt` và module `Demo/utils/feature_engineering.py`.
 
-Target churn khoảng 27%, không quá lệch nhưng vẫn nên thử.
+## 6. Kết quả chính
 
-Bạn nên so sánh 3 hướng:
+### Baseline models
 
-1. Không xử lý imbalance
-2. class_weight="balanced"
-3. SMOTE
+Một số kết quả baseline tốt nhất:
 
-Không nên áp dụng SMOTE trước train-test split.
+| Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
+|---|---:|---:|---:|---:|---:|
+| CatBoost | 0.9475 | 0.9167 | 0.8821 | 0.8990 | 0.9826 |
+| XGBoost | 0.9450 | 0.9078 | 0.8821 | 0.8947 | 0.9800 |
+| LightGBM | 0.9425 | 0.9150 | 0.8632 | 0.8883 | 0.9775 |
 
-Pipeline đúng:
+### Sau feature engineering
 
-Train-test split
-→ Fit preprocessing trên train
-→ Apply SMOTE chỉ trên X_train
-→ Train model
-→ Evaluate trên X_test gốc
+Feature engineering giúp cải thiện rõ rệt nhiều mô hình. Ví dụ:
 
-Models nên thử imbalance:
+| Model | Original ROC-AUC | FE ROC-AUC | Original F1 | FE F1 |
+|---|---:|---:|---:|---:|
+| Random Forest | 0.9683 | 0.9884 | 0.8564 | 0.9372 |
+| Extra Trees | 0.9579 | 0.9824 | 0.8305 | 0.9017 |
+| CatBoost | 0.9826 | 0.9897 | 0.8990 | 0.9294 |
 
-- Logistic Regression + class_weight
-- RandomForest + class_weight
-- XGBoost + scale_pos_weight
-- CatBoost + auto_class_weights
-- SMOTE + RandomForest/XGBoost/LightGBM
-6. Notebook 04 — Training models
+### Xử lý imbalance
 
-Baseline models nên có:
+Kết quả tốt nhất trong file `Reports/imbalance_handling_results.csv`:
 
-1. Logistic Regression
-2. KNN
-3. Decision Tree
-4. Random Forest
-5. Extra Trees
-6. Gradient Boosting
-7. XGBoost
-8. LightGBM
-9. CatBoost
+| Experiment | Strategy | Model | Accuracy | Recall churn | F1 churn | ROC-AUC |
+|---|---|---|---:|---:|---:|---:|
+| FE Only | No Handling | Random Forest | 0.9650 | 0.9104 | 0.9324 | 0.9885 |
+| FE + Class Weight | Class Weight | Random Forest | 0.9650 | 0.9057 | 0.9320 | 0.9885 |
+| FE + RandomOverSampler | RandomOverSampler | XGBoost | 0.9613 | 0.9245 | 0.9267 | 0.9856 |
 
-Metrics nên dùng:
+Trong bài toán churn, không nên chỉ nhìn Accuracy. Các metric quan trọng hơn là Recall/F1 của class `Churn = 1`, ROC-AUC và PR-AUC.
 
-- Accuracy
-- Precision
-- Recall
-- F1-score
-- Macro F1
-- ROC-AUC
-- PR-AUC
+## 7. Giải thích mô hình
 
-Với churn, đừng chỉ nhìn Accuracy. Nên ưu tiên:
+Theo kết quả SHAP, các đặc trưng có ảnh hưởng mạnh gồm:
 
-- Recall của class Churn = 1
-- F1-score class Churn = 1
-- ROC-AUC
-- PR-AUC
-7. Notebook 05 — Model tuning
+- `frequency_drop`
+- `Age`
+- `loyalty_score`
+- `frequency_ratio_current_total`
+- `engagement_score`
+- `total_engagement_score`
+- `Lifetime`
+- `Month_to_end_contract`
+- `Avg_class_frequency_current_month`
 
-Chỉ tune 2–3 model tốt nhất, không tune tất cả.
+Insight nghiệp vụ chính:
 
-Tôi khuyên tune:
+- Khách hàng giảm tần suất tập luyện trong tháng hiện tại có nguy cơ churn cao hơn.
+- Khách hàng mới, thời gian gắn bó thấp hoặc sắp hết hạn hợp đồng thường có rủi ro cao.
+- Mức độ gắn kết qua group visits, khuyến mãi bạn bè và tần suất tập luyện giúp giảm nguy cơ churn.
+- Các đặc trưng kết hợp từ hành vi tập luyện và trạng thái hợp đồng có giá trị dự đoán tốt.
 
-1. CatBoost
-2. XGBoost
-3. RandomForest hoặc LightGBM
+## 8. Cách chạy notebook
 
-Search strategy:
+Khuyến nghị dùng Python 3.11.
 
-- RandomizedSearchCV trước
-- Sau đó Optuna nếu muốn chuyên nghiệp hơn
+Tạo virtual environment ở thư mục gốc project:
 
-CV:
+```powershell
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+```
 
-StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+Cài các thư viện cần thiết. Nếu chỉ chạy demo, dùng file trong `Demo/requirements.txt`:
 
-Scoring chính:
+```powershell
+pip install -r Demo\requirements.txt
+```
 
-scoring = "f1"
+Nếu chạy toàn bộ notebook, cần thêm các thư viện thường dùng cho phân tích và huấn luyện như:
 
-hoặc tốt hơn:
+```powershell
+pip install matplotlib seaborn jupyter xgboost lightgbm imbalanced-learn openpyxl
+```
 
-scoring = "roc_auc"
+Mở Jupyter Notebook:
 
-Nếu mục tiêu là bắt churn tốt hơn, có thể dùng:
+```powershell
+jupyter notebook
+```
 
-scoring = "recall"
-8. Notebook 06 — Evaluation + SHAP
+Sau đó chạy lần lượt các notebook trong thư mục `Notebooks/`.
 
-Phần này rất quan trọng để báo cáo đẹp.
+## 9. Cách chạy demo web
 
-Cần có:
+Demo web nằm trong thư mục `Demo/` và sử dụng FastAPI.
 
-1. Confusion matrix
-2. Classification report
-3. ROC curve
-4. Precision-Recall curve
-5. Feature importance
-6. SHAP summary plot
-7. SHAP dependence plot
-8. Phân tích business insight
+Các bước chạy:
 
-Các feature khả năng cao sẽ mạnh:
+```powershell
+cd Demo
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+python -m uvicorn app:app --reload
+```
 
-- Lifetime
-- Month_to_end_contract
-- Avg_class_frequency_current_month
-- Avg_class_frequency_total
-- Contract_period
-- Age
+Mở trình duyệt tại:
 
-Diễn giải business:
+```text
+http://127.0.0.1:8000
+```
 
-Khách có lifetime thấp, sắp hết hợp đồng, tần suất đi tập tháng hiện tại thấp → khả năng churn cao.
-9. Notebook 07 — Final pipeline
+Các chức năng chính của demo:
 
-Notebook cuối nên làm gọn:
+- Dự đoán churn cho một khách hàng.
+- Upload CSV để dự đoán hàng loạt.
+- Xuất file kết quả dự đoán.
+- Hiển thị xác suất churn, nhãn dự đoán, mức rủi ro, lý do chính và khuyến nghị giữ chân khách hàng.
 
-1. Load data
-2. Split data
-3. Preprocessing
-4. Train best model
-5. Evaluate final
-6. Save model
-7. Save preprocessing pipeline
-8. Test predict 1 khách hàng mẫu
+File CSV dùng cho batch prediction cần có đủ các cột đầu vào gốc:
 
-Export:
+```text
+gender
+Near_Location
+Partner
+Promo_friends
+Phone
+Contract_period
+Group_visits
+Age
+Avg_additional_charges_total
+Month_to_end_contract
+Lifetime
+Avg_class_frequency_total
+Avg_class_frequency_current_month
+```
 
-joblib.dump(best_model, "models/best_model.pkl")
-joblib.dump(preprocessor, "models/preprocessing_pipeline.pkl")
-10. Feature engineering nên thử
+Kết quả batch sẽ được lưu trong:
 
-Nên tạo các feature này:
+```text
+Demo/outputs/
+```
 
-df["contract_remaining_ratio"] = df["Month_to_end_contract"] / df["Contract_period"]
+## 10. Model đã lưu
 
-df["frequency_drop"] = (
-    df["Avg_class_frequency_total"] 
-    - df["Avg_class_frequency_current_month"]
-)
+Các model đã train nằm trong thư mục `Models/`:
 
-df["engagement_score"] = (
-    df["Avg_class_frequency_current_month"] 
-    * df["Lifetime"]
-)
+- `best_baseline_model.pkl`: model baseline tốt nhất.
+- `best_feature_engineering_model.pkl`: model tốt nhất sau feature engineering.
+- `best_imbalance_model.pkl`: model tốt nhất sau thử nghiệm imbalance handling.
+- `catboost_fe_shap_model.pkl`: model phục vụ phân tích SHAP.
 
-df["spending_per_month"] = (
-    df["Avg_additional_charges_total"] 
-    / (df["Lifetime"] + 1)
-)
+Demo sử dụng model tại:
 
-df["is_new_customer"] = (df["Lifetime"] <= 1).astype(int)
+```text
+Demo/models/best_feature_engineering_model.pkl
+```
 
-df["is_contract_ending"] = (df["Month_to_end_contract"] <= 1).astype(int)
+## 11. Báo cáo và slide
 
-df["low_activity"] = (
-    df["Avg_class_frequency_current_month"] < 1
-).astype(int)
+- Báo cáo: `CS114_Report_Nhom5.pdf`
+- Slide trình bày: `CS114_Slide_Nhom5.pdf`
+- Hình ảnh và bảng kết quả: `Reports/` và `OutputForReports/`
 
-Nhưng nhớ: feature engineering phải tạo sau split trong pipeline hoặc tạo bằng transformer để tránh leakage nhẹ.
+## 12. Ghi chú
 
-11. Thứ tự làm tốt nhất
-01_eda
-→ 02_baseline_models không feature engineering
-→ 03_feature_engineering
-→ 04_imbalance_handling
-→ 05_model_tuning
-→ 06_shap_analysis
-→ 07_final_pipeline
-
-Tôi đề xuất bạn đừng làm imbalance quá sớm. Hãy có baseline sạch trước, rồi mới chứng minh imbalance handling có cải thiện hay không.
-
-12. Mục tiêu điểm số hợp lý
-
-Với dataset này, nếu làm tốt:
-
-Accuracy: 0.88–0.93
-ROC-AUC: 0.90+
-F1 churn class: 0.75–0.85
-
-Mục tiêu báo cáo không phải chỉ “accuracy cao”, mà là:
-
-Mô hình phát hiện khách hàng có nguy cơ rời bỏ và giải thích được nguyên nhân ch
+- Cần split train/test trước khi xử lý dữ liệu để tránh data leakage.
+- Các kỹ thuật oversampling như SMOTE chỉ được fit trên tập train.
+- Với bài toán churn, ưu tiên phát hiện tốt khách hàng có nguy cơ rời bỏ thay vì chỉ tối ưu Accuracy.
+- Kết quả dự đoán nên được dùng như công cụ hỗ trợ ra quyết định, kết hợp thêm hiểu biết nghiệp vụ về khách hàng và chiến lược chăm sóc.

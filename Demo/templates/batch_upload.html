@@ -5,22 +5,43 @@
 <section class="batch-hero glass-card">
   <span class="eyebrow">Dự đoán hàng loạt</span>
   <h1>Tải CSV khách hàng</h1>
-  <p>Dự đoán rủi ro rời bỏ cho nhiều khách hàng cùng lúc. Trang này chỉ chạy suy luận, không lấy mẫu.</p>
+  <p>Chọn file CSV để xem trước dữ liệu, kiểm tra cột bắt buộc và chạy dự đoán cho nhiều khách hàng cùng lúc.</p>
   {% if model_error %}
   <div class="alert">Lỗi tải mô hình: {{ model_error }}</div>
   {% endif %}
+  <div class="hero-actions">
+    <a class="btn btn-secondary" href="/download_sample_csv">Tải file CSV mẫu</a>
+  </div>
   <form class="upload-form" action="/batch_predict" method="post" enctype="multipart/form-data">
-    <input type="file" name="file" accept=".csv" required>
-    <button class="btn btn-primary" type="submit">Chạy dự đoán hàng loạt</button>
+    <input id="csv-file-input" type="file" name="file" accept=".csv" required>
+    <button id="batch-submit-button" class="btn btn-primary" type="submit" disabled>Chạy dự đoán hàng loạt</button>
   </form>
 </section>
 
-<section class="glass-card table-card">
-  <h2>Các cột CSV bắt buộc</h2>
-  <div class="feature-list">
-    {% for column in required_columns %}
-    <span>{{ column }}</span>
-    {% endfor %}
+<section class="grid-2">
+  <div class="glass-card table-card">
+    <h2>Kiểm tra file CSV</h2>
+    <div id="csv-validation" class="validation-panel muted-box">
+      Chưa chọn file CSV.
+    </div>
+    <div class="table-wrap compact-table">
+      <table id="csv-preview-table"></table>
+    </div>
   </div>
+
+  <aside class="glass-card upload-card">
+    <h2>Các cột CSV bắt buộc</h2>
+    <div class="feature-list">
+      {% for column in required_columns %}
+      <span>{{ column }}</span>
+      {% endfor %}
+    </div>
+  </aside>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.requiredCsvColumns = {{ required_columns | tojson }};
+</script>
 {% endblock %}

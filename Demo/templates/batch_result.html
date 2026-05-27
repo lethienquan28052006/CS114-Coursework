@@ -4,18 +4,71 @@
 {% block content %}
 <section class="summary-grid">
   <div class="glass-card stat-card"><span>Tổng số dòng</span><strong>{{ summary.rows }}</strong></div>
-  <div class="glass-card stat-card"><span>Rủi ro cao</span><strong>{{ summary.high_risk }}</strong></div>
-  <div class="glass-card stat-card"><span>Rủi ro trung bình</span><strong>{{ summary.medium_risk }}</strong></div>
+  <div class="glass-card stat-card"><span>Rủi ro cao</span><strong>{{ summary.high_risk }}</strong><em>{{ summary.high_percent }}%</em></div>
+  <div class="glass-card stat-card"><span>Rủi ro trung bình</span><strong>{{ summary.medium_risk }}</strong><em>{{ summary.medium_percent }}%</em></div>
   <div class="glass-card stat-card"><span>Xác suất rời bỏ TB</span><strong>{{ summary.avg_probability }}%</strong></div>
+</section>
+
+<section class="glass-card table-card">
+  <span class="eyebrow">Dashboard tổng quan</span>
+  <h2>Phân bố mức rủi ro</h2>
+  <div class="risk-bars">
+    <div class="risk-row">
+      <span>Rủi ro cao</span>
+      <div class="risk-track"><div class="risk-fill high" style="width: {{ summary.high_percent }}%"></div></div>
+      <strong>{{ summary.high_percent }}%</strong>
+    </div>
+    <div class="risk-row">
+      <span>Rủi ro trung bình</span>
+      <div class="risk-track"><div class="risk-fill medium" style="width: {{ summary.medium_percent }}%"></div></div>
+      <strong>{{ summary.medium_percent }}%</strong>
+    </div>
+    <div class="risk-row">
+      <span>Rủi ro thấp</span>
+      <div class="risk-track"><div class="risk-fill low" style="width: {{ summary.low_percent }}%"></div></div>
+      <strong>{{ summary.low_percent }}%</strong>
+    </div>
+  </div>
+</section>
+
+<section class="glass-card table-card">
+  <div class="section-header inline">
+    <div>
+      <span class="eyebrow">Ưu tiên chăm sóc</span>
+      <h2>Top 5 khách hàng rủi ro cao nhất</h2>
+    </div>
+    <a class="btn btn-primary" href="/download/{{ filename }}">Tải CSV xuống</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          {% if priority_preview %}
+            {% for key in priority_preview[0].keys() %}
+            <th>{{ key }}</th>
+            {% endfor %}
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in priority_preview %}
+        <tr>
+          {% for value in row.values() %}
+          <td>{{ value }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </section>
 
 <section class="glass-card table-card">
   <div class="section-header inline">
     <div>
       <span class="eyebrow">Kết quả hàng loạt</span>
-      <h1>Xem trước dự đoán</h1>
+      <h1>Xem trước 20 dòng đầu</h1>
     </div>
-    <a class="btn btn-primary" href="/download/{{ filename }}">Tải CSV xuống</a>
   </div>
   <div class="table-wrap">
     <table>

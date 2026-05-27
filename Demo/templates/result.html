@@ -21,7 +21,7 @@
       {% for reason in result.top_reasons %}
       <div class="driver-item">
         <strong>{{ reason.reason }}</strong>
-        <span>{{ reason.feature }} = {{ "%.3f"|format(reason.value) }}</span>
+        <span>{{ reason.feature_label }} = {{ "%.3f"|format(reason.value) }}</span>
       </div>
       {% endfor %}
     </div>

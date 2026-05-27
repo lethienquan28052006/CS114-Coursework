@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block title %}Lịch sử dự đoán{% endblock %}
+
+{% block content %}
+<section class="batch-hero glass-card">
+  <span class="eyebrow">Lịch sử dự đoán</span>
+  <h1>Các lần dự đoán gần đây</h1>
+  <p>Trang này lưu tối đa 50 lần dự đoán một khách hàng gần nhất để tiện xem lại khi demo.</p>
+</section>
+
+<section class="glass-card table-card">
+  <div class="section-header inline">
+    <div>
+      <span class="eyebrow">Single prediction</span>
+      <h2>Nhật ký kết quả</h2>
+    </div>
+    <a class="btn btn-secondary" href="/">Tạo dự đoán mới</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Thời gian</th>
+          <th>Xác suất</th>
+          <th>Dự đoán</th>
+          <th>Mức rủi ro</th>
+          <th>Lý do chính</th>
+          <th>Tuổi</th>
+          <th>Hợp đồng</th>
+          <th>Thời gian gắn bó</th>
+          <th>Tần suất tháng này</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in history %}
+        <tr>
+          <td>{{ item.created_at }}</td>
+          <td>{{ item.probability_percent }}%</td>
+          <td>{{ item.prediction }}</td>
+          <td>{{ item.risk_level }}</td>
+          <td>{{ item.top_reason }}</td>
+          <td>{{ item.age }}</td>
+          <td>{{ item.contract_period }}</td>
+          <td>{{ item.lifetime }}</td>
+          <td>{{ item.avg_frequency_current_month }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="9">Chưa có lịch sử dự đoán.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

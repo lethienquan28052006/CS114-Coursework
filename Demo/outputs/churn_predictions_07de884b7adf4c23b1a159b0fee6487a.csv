@@ -1,0 +1,4 @@
+gender,Near_Location,Partner,Promo_friends,Phone,Contract_period,Group_visits,Age,Avg_additional_charges_total,Month_to_end_contract,Lifetime,Avg_class_frequency_total,Avg_class_frequency_current_month,churn_probability,prediction,risk_level,top_reason,recommendation
+1,1,1,0,1,12,1,31,180.5,8.0,14,2.8,2.6,0.00029740238578230676,NOT CHURN,LOW,Hợp đồng sắp đến giai đoạn gia hạn,Gửi chiến dịch tái tương tác và tặng một buổi tập cá nhân miễn phí. | Đề xuất ưu đãi gia hạn trước khi hợp đồng hết hạn.
+0,0,0,0,1,1,0,27,62.0,0.5,1,1.4,0.2,0.9997344712987333,CHURN,HIGH,Hoạt động trong tháng hiện tại thấp,Gửi chiến dịch tái tương tác và tặng một buổi tập cá nhân miễn phí. | Đề xuất ưu đãi gia hạn trước khi hợp đồng hết hạn.
+1,1,0,1,1,6,0,42,120.0,2.0,5,2.1,1.2,0.6389932365729201,CHURN,MEDIUM,Hợp đồng sắp đến giai đoạn gia hạn,Gửi chiến dịch tái tương tác và tặng một buổi tập cá nhân miễn phí. | Đề xuất ưu đãi gia hạn trước khi hợp đồng hết hạn.

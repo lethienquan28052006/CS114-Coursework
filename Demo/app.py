@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import json
 import uuid
+from datetime import datetime
+from io import StringIO
 from pathlib import Path
 
 import pandas as pd
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -16,6 +19,8 @@ from utils.risk_analysis import risk_badge_class
 
 
 ensure_directories()
+HISTORY_PATH = OUTPUT_DIR / "prediction_history.json"
+HISTORY_LIMIT = 50
 
 app = FastAPI(
     title="Gym Customer Churn Prediction System",
@@ -46,6 +51,71 @@ def _ensure_model_ready() -> ChurnPredictor:
     if predictor is None:
         raise HTTPException(status_code=500, detail=f"Model could not be loaded: {MODEL_LOAD_ERROR}")
     return predictor
+
+
+def _load_history() -> list[dict]:
+    if not HISTORY_PATH.exists():
+        return []
+    try:
+        return json.loads(HISTORY_PATH.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return []
+
+
+def _save_history(entry: dict) -> None:
+    history = _load_history()
+    history.insert(0, entry)
+    HISTORY_PATH.write_text(json.dumps(history[:HISTORY_LIMIT], ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _sample_customer_rows() -> list[dict[str, float]]:
+    return [
+        {
+            "gender": 1,
+            "Near_Location": 1,
+            "Partner": 1,
+            "Promo_friends": 0,
+            "Phone": 1,
+            "Contract_period": 12,
+            "Group_visits": 1,
+            "Age": 31,
+            "Avg_additional_charges_total": 180.5,
+            "Month_to_end_contract": 8,
+            "Lifetime": 14,
+            "Avg_class_frequency_total": 2.8,
+            "Avg_class_frequency_current_month": 2.6,
+        },
+        {
+            "gender": 0,
+            "Near_Location": 0,
+            "Partner": 0,
+            "Promo_friends": 0,
+            "Phone": 1,
+            "Contract_period": 1,
+            "Group_visits": 0,
+            "Age": 27,
+            "Avg_additional_charges_total": 62.0,
+            "Month_to_end_contract": 0.5,
+            "Lifetime": 1,
+            "Avg_class_frequency_total": 1.4,
+            "Avg_class_frequency_current_month": 0.2,
+        },
+        {
+            "gender": 1,
+            "Near_Location": 1,
+            "Partner": 0,
+            "Promo_friends": 1,
+            "Phone": 1,
+            "Contract_period": 6,
+            "Group_visits": 0,
+            "Age": 42,
+            "Avg_additional_charges_total": 120.0,
+            "Month_to_end_contract": 2,
+            "Lifetime": 5,
+            "Avg_class_frequency_total": 2.1,
+            "Avg_class_frequency_current_month": 1.2,
+        },
+    ]
 
 
 @app.get("/")
@@ -94,6 +164,19 @@ async def predict(
         "Avg_class_frequency_current_month": Avg_class_frequency_current_month,
     }
     result = model.predict_single(payload)
+    _save_history(
+        {
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "probability_percent": result["probability_percent"],
+            "prediction": result["prediction"],
+            "risk_level": result["risk_level"],
+            "top_reason": result["top_reasons"][0]["reason"] if result["top_reasons"] else "",
+            "age": payload["Age"],
+            "contract_period": payload["Contract_period"],
+            "lifetime": payload["Lifetime"],
+            "avg_frequency_current_month": payload["Avg_class_frequency_current_month"],
+        }
+    )
     return templates.TemplateResponse(
         "result.html",
         {
@@ -101,6 +184,17 @@ async def predict(
             "input_data": payload,
             "result": result,
             "risk_badge": risk_badge_class(result["risk_level"]),
+        },
+    )
+
+
+@app.get("/history")
+async def history_page(request: Request):
+    return templates.TemplateResponse(
+        "history.html",
+        {
+            "request": request,
+            "history": _load_history(),
         },
     )
 
@@ -114,6 +208,17 @@ async def batch_page(request: Request):
             "required_columns": ORIGINAL_FEATURES,
             "model_error": MODEL_LOAD_ERROR,
         },
+    )
+
+
+@app.get("/download_sample_csv")
+async def download_sample_csv():
+    buffer = StringIO()
+    pd.DataFrame(_sample_customer_rows(), columns=ORIGINAL_FEATURES).to_csv(buffer, index=False)
+    return Response(
+        content=buffer.getvalue(),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="gym_churn_sample.csv"'},
     )
 
 
@@ -153,6 +258,20 @@ async def batch_predict(request: Request, file: UploadFile = File(...)):
         "low_risk": int((result_df["risk_level"] == "LOW").sum()),
         "avg_probability": round(float(result_df["churn_probability"].mean()) * 100, 2),
     }
+    summary["high_percent"] = round(summary["high_risk"] / summary["rows"] * 100, 1) if summary["rows"] else 0
+    summary["medium_percent"] = round(summary["medium_risk"] / summary["rows"] * 100, 1) if summary["rows"] else 0
+    summary["low_percent"] = round(summary["low_risk"] / summary["rows"] * 100, 1) if summary["rows"] else 0
+
+    priority_columns = [
+        column
+        for column in ["churn_probability", "prediction", "risk_level", "top_reason", "recommendation"]
+        if column in result_df.columns
+    ]
+    priority_preview = (
+        result_df.sort_values("churn_probability", ascending=False)
+        .head(5)[priority_columns]
+        .to_dict(orient="records")
+    )
 
     return templates.TemplateResponse(
         "batch_result.html",
@@ -160,6 +279,7 @@ async def batch_predict(request: Request, file: UploadFile = File(...)):
             "request": request,
             "summary": summary,
             "preview": result_df.head(20).to_dict(orient="records"),
+            "priority_preview": priority_preview,
             "filename": output_name,
         },
     )

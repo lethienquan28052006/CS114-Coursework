@@ -5,16 +5,30 @@ import pandas as pd
 
 
 DRIVER_RULES = {
-    "frequency_drop": ("Attendance dropped significantly", "Attendance is stable"),
-    "low_current_activity": ("Low current month activity", "Current activity is healthy"),
-    "contract_remaining_ratio": ("Contract is close to renewal window", "Contract still has runway"),
-    "is_contract_ending": ("Contract ending soon", "Contract is not ending soon"),
-    "engagement_score": ("Low engagement score", "Strong engagement score"),
-    "loyalty_score": ("Low loyalty signal", "Strong loyalty signal"),
-    "is_new_customer": ("New customer still forming habits", "Established customer history"),
-    "far_no_group": ("Far location and no group activity", "Convenience or group support present"),
-    "no_group_low_activity": ("No group visits and low activity", "Social engagement supports retention"),
-    "spending_per_month": ("Low service spend", "Service spend indicates commitment"),
+    "frequency_drop": ("Tần suất tập giảm đáng kể", "Tần suất tập ổn định"),
+    "low_current_activity": ("Hoạt động trong tháng hiện tại thấp", "Hoạt động hiện tại ở mức tốt"),
+    "contract_remaining_ratio": ("Hợp đồng sắp đến giai đoạn gia hạn", "Hợp đồng vẫn còn nhiều thời gian"),
+    "is_contract_ending": ("Hợp đồng sắp hết hạn", "Hợp đồng chưa gần hết hạn"),
+    "engagement_score": ("Điểm tương tác thấp", "Điểm tương tác tốt"),
+    "loyalty_score": ("Tín hiệu gắn bó thấp", "Tín hiệu gắn bó tốt"),
+    "is_new_customer": ("Khách hàng mới chưa hình thành thói quen", "Khách hàng đã có lịch sử gắn bó"),
+    "far_no_group": ("Ở xa và không tham gia lớp nhóm", "Có lợi thế về vị trí hoặc hoạt động nhóm"),
+    "no_group_low_activity": ("Không tham gia lớp nhóm và hoạt động thấp", "Tương tác xã hội hỗ trợ giữ chân"),
+    "spending_per_month": ("Chi tiêu dịch vụ thấp", "Chi tiêu dịch vụ thể hiện mức cam kết"),
+}
+
+
+FEATURE_LABELS = {
+    "frequency_drop": "Mức giảm tần suất tập",
+    "low_current_activity": "Hoạt động tháng hiện tại thấp",
+    "contract_remaining_ratio": "Tỷ lệ thời hạn hợp đồng còn lại",
+    "is_contract_ending": "Hợp đồng sắp hết hạn",
+    "engagement_score": "Điểm tương tác",
+    "loyalty_score": "Điểm gắn bó",
+    "is_new_customer": "Khách hàng mới",
+    "far_no_group": "Ở xa và không tập nhóm",
+    "no_group_low_activity": "Không tập nhóm và ít hoạt động",
+    "spending_per_month": "Chi tiêu mỗi tháng",
 }
 
 
@@ -52,10 +66,11 @@ def explain_row(row: pd.Series, top_n: int = 5) -> dict:
         items.append(
             {
                 "feature": feature,
+                "feature_label": FEATURE_LABELS.get(feature, feature),
                 "value": float(row.get(feature, 0)),
                 "contribution": float(score),
                 "reason": risk_text if score >= 0 else protective_text,
-                "direction": "increases churn risk" if score >= 0 else "decreases churn risk",
+                "direction": "làm tăng rủi ro rời bỏ" if score >= 0 else "làm giảm rủi ro rời bỏ",
             }
         )
     sorted_items = sorted(items, key=lambda x: abs(x["contribution"]), reverse=True)
@@ -72,4 +87,4 @@ def batch_top_reason(row: pd.Series) -> str:
     explanation = explain_row(row, top_n=1)
     if explanation["top_positive"]:
         return explanation["top_positive"][0]["reason"]
-    return "No strong risk driver detected"
+    return "Không phát hiện yếu tố rủi ro nổi bật"

@@ -157,6 +157,13 @@ p {
   gap: 12px;
 }
 
+.demo-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 14px 0 4px;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -172,6 +179,12 @@ p {
 
 .btn:hover {
   filter: brightness(1.08);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.45) brightness(0.75);
+  opacity: 0.7;
 }
 
 .btn-primary {
@@ -212,6 +225,14 @@ p {
 .metric strong,
 .stat-card strong {
   font-size: 1.35rem;
+}
+
+.stat-card em {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 700;
 }
 
 .grid-2,
@@ -404,6 +425,68 @@ select:focus {
 
 .table-card {
   margin-top: 20px;
+}
+
+.muted-box,
+.validation-panel {
+  padding: 14px;
+  border-radius: 8px;
+  color: var(--muted);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+
+.validation-success {
+  color: #d9fbe7;
+  border-color: rgba(74, 222, 128, 0.75);
+}
+
+.validation-error {
+  color: #ffd7df;
+  border-color: rgba(251, 113, 133, 0.8);
+}
+
+.compact-table table {
+  min-width: 720px;
+}
+
+.risk-bars {
+  display: grid;
+  gap: 14px;
+}
+
+.risk-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 70px;
+  align-items: center;
+  gap: 12px;
+  color: #dce5ff;
+}
+
+.risk-track {
+  height: 13px;
+  border-radius: 999px;
+  background: #0a1028;
+  overflow: hidden;
+}
+
+.risk-fill {
+  height: 100%;
+  min-width: 2px;
+  border-radius: 999px;
+}
+
+.risk-fill.high {
+  background: var(--red);
+}
+
+.risk-fill.medium {
+  background: var(--yellow);
+}
+
+.risk-fill.low {
+  background: var(--green);
 }
 
 .table-wrap {

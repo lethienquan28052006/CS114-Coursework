@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Dự đoán rời bỏ phòng gym{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}?v=4">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}?v=6">
 </head>
 <body>
   <div class="page-shell">
@@ -16,6 +16,7 @@
       <div class="nav-links">
         <a href="/">Dự đoán</a>
         <a href="/batch">Dự đoán nhiều khách hàng (CSV)</a>
+        <a href="/history">Lịch sử</a>
         <a href="/health">Trạng thái</a>
       </div>
     </nav>
@@ -23,7 +24,7 @@
       {% block content %}{% endblock %}
     </main>
   </div>
-  <script src="{{ url_for('static', path='js/app.js') }}?v=4"></script>
+  <script src="{{ url_for('static', path='js/app.js') }}?v=6"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>
